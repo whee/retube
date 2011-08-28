@@ -1,0 +1,4 @@
+* TODO Usage documentation
+* TODO Password support
+* TODO Option to block publisher if no subscribers are present
+* TODO If a channel isn't specified, generate one, tell the user, block the publisher
