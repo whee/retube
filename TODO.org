@@ -2,3 +2,6 @@
 * TODO Password support
 * TODO Option to block publisher if no subscribers are present
 * TODO If a channel isn't specified, generate one, tell the user, block the publisher
+This could probably be hands-off. I.e., generate something, publisher
+LPUSHs the channel to a list named retube-channels-$USER, subscriber
+BRPOPs retube-channels-$USER.
