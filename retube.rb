@@ -53,6 +53,14 @@ class RetubeOptions
     end
 
     opts.parse!(args)
+
+    if options.name.nil?
+      puts 'ERROR: Missing tube type. Specify --in or --out.'
+      puts
+      puts opts
+      exit
+    end
+
     options
   end
 end
