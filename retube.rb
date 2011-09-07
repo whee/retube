@@ -116,4 +116,3 @@ trap(:INT) { exit }
 
 options = RetubeOptions.parse(ARGV)
 tube = Tube.new(options.name, options.direction).go
-pp options
