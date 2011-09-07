@@ -66,52 +66,85 @@ class RetubeOptions
 end
 
 class Tube
-  attr_reader :name, :direction
-  OUTOFBAND = '.oob'
+  attr_reader :config
 
-  def initialize(name, direction, persist=false)
-    @name, @direction = name, direction
-    @oob = self.class.outofband(name)
-    @redis = Redis.connect
-  end
+  OUTOFBAND = '.oob'
 
   def self.outofband(channel)
     channel + OUTOFBAND
   end
 
-  def transact(&block)
-    @redis.publish @oob, 'begin'
-    yield
-    @redis.publish @oob, 'end'
+  def initialize(name, direction, persist=false)
+    @config = OpenStruct.new
+    @config.name = name
+    @config.direction = direction
+    @config.persist = persist
+    @config.redis = Redis.connect
+    @config.oob = self.class.outofband(name)
+
+    @tube = (direction == :in ? In : Out).new(@config)
   end
-  
+
   def go
-    if @direction == :in then
-      self.in 
+    if @config.direction == :in then
+      @tube.receive
     else
-      transact {self.out}
+      @tube.send ARGF
     end
   end
 
-  def in
-    @redis.subscribe(@name, @oob) do |on|
-      on.message do |channel, message|
-        if channel == @oob then
-          @redis.unsubscribe if !@persist and message == 'end'
-        else
-          puts message
+  class In
+    def initialize(config)
+      @tube = config
+    end
+
+    def receive
+      @tube.redis.subscribe(@tube.name, @tube.oob) do |on|
+        on.message do |channel, message|
+          if channel == @tube.oob then
+            oob message
+          else
+            handle message
+          end
         end
       end
     end
+
+    def oob(message)
+      @tube.redis.unsubscribe if !@tube.persist and message == 'end'
+    end
+
+    def handle(data)
+      puts data
+    end
   end
 
-  def out
-    ARGF.each_line do |line|
-      @redis.publish @name, line
+  class Out
+    def initialize(config)
+      @tube = config
+    end
+
+    def oob(message)
+      @tube.redis.publish @tube.oob, message
+    end
+
+    def transact(&block)
+      oob 'begin'
+      yield
+      oob 'end'
+    end
+
+    def send(data)
+      data = *data
+      transact {
+        data.each do |line|
+          @tube.redis.publish @tube.name, line
+        end
+      }
     end
   end
 end
-      
+
 trap(:INT) { exit }
 
 options = RetubeOptions.parse(ARGV)
