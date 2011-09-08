@@ -9,29 +9,29 @@ Observe:
 ### Console A
 Bob is waiting for something exciting to happen.
 
-> [bob@unicorn ~]$ retube --in important-info-channel
+    [bob@unicorn ~]$ retube --in important-info-channel
 
 ### Console B
 So is Jane.
 
-> [jane@goblin ~]$ retube --in important-info-channel
+    [jane@goblin ~]$ retube --in important-info-channel
 
 ### Console C
 Elsewhere, something bad is happening.
 
-> [tom@cloud ~]$ echo "CPU#0: Possible thermal failure (CPU on fire ?)." | retube --out important-info-channel
+    [tom@cloud ~]$ echo "CPU#0: Possible thermal failure (CPU on fire ?)." | retube --out important-info-channel
 
 (OK, it's really just an evil person.)
 
 ...meanwhile:
 
 ### Console A
-> [bob@unicorn ~]$ retube --in important-info-channel
-> CPU#0: Possible thermal failure (CPU on fire ?).
+    [bob@unicorn ~]$ retube --in important-info-channel
+    CPU#0: Possible thermal failure (CPU on fire ?).
 
 ### Console B
-> [jane@goblin ~]$ retube --in important-info-channel
-> CPU#0: Possible thermal failure (CPU on fire ?).
+    [jane@goblin ~]$ retube --in important-info-channel
+    CPU#0: Possible thermal failure (CPU on fire ?).
 
 ## What's going on?
 
